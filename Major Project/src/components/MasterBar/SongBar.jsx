@@ -38,54 +38,63 @@ const SongBar = () => {
             dispatch(playMaster());
         }
     };
-    const addToLiked = async() => {
-        console.log(masterSong.mp3)
-        let data = JSON.stringify({
-            song_mp3:masterSong.mp3.src,
-            song_title:masterSong.title,
-            song_artist:masterSong.artist,
-            song_thumbnail:masterSong.img,
-        })
-        const res = await fetch('http://localhost:5000/api/playlist/like', {
-            method:"POST",
-            headers:{
-                'Content-Type':"application/json",
-                token:localStorage.getItem('token')
-            },
-            body:data,
-        })
+    const [isLooping, setIsLooping] = useState(false);
+    const [isShuffling, setIsShuffling] = useState(false);
 
-        let d = await res.json();
-        console.log(d)
+    const toggleLoop = () => setIsLooping(!isLooping);
+    const toggleShuffle = () => setIsShuffling(!isShuffling);
 
-    };
     useEffect(() => {
+        let interval = null;
+
         if (masterSong.mp3) {
-            setDuration(formatTime(masterSong?.mp3?.duration));
+            setDuration(formatTime(masterSong.mp3.duration));
             if (isPlaying) {
-                masterSong?.mp3?.play();
+                masterSong.mp3.play();
             } else {
-                masterSong?.mp3?.pause();
+                masterSong.mp3.pause();
             }
         }
-        if (isPlaying) {
-            setInterval(() => {
-                if (progress === 100) {
-                    dispatch(pauseMaster());
-                    resetEverything();
-                } else {
-                    setProgress(
-                        Math.round(
-                            (masterSong.mp3.currentTime /
-                                masterSong.mp3.duration) *
-                                100
-                        )
-                    );
-                    setCurrTime(formatTime(masterSong.mp3.currentTime));
+
+        if (isPlaying && masterSong.mp3) {
+            interval = setInterval(() => {
+                const currentTime = masterSong.mp3.currentTime;
+                const totalDuration = masterSong.mp3.duration;
+                const progressPercentage = Math.round((currentTime / totalDuration) * 100);
+
+                setProgress(progressPercentage);
+                setCurrTime(formatTime(currentTime));
+
+                if (progressPercentage === 100) {
+                    if (isLooping) {
+                        masterSong.mp3.currentTime = 0;
+                        masterSong.mp3.play();
+                    } else {
+                        nextSong();
+                    }
                 }
             }, 1000);
         }
-    }, [masterSong, isPlaying]);
+
+        return () => {
+            if (interval) {
+                clearInterval(interval);
+            }
+        };
+    }, [masterSong, isPlaying, isLooping, songIdx, songs, isShuffling]);
+    const nextSong = () => {
+        let nextIndex;
+        if (isShuffling) {
+            nextIndex = Math.floor(Math.random() * songs.length);
+        } else {
+            nextIndex = songIdx + 1;
+            if (nextIndex >= songs.length) { // Check if it is the end of the list
+                nextIndex = 0; // Optionally loop to the first song
+            }
+        }
+        setSongIdx(nextIndex);
+        dispatch(playSong(songs[nextIndex]));
+    };
 
     const changeProgress = (e) => {
         setProgress(e.target.value);
@@ -115,12 +124,7 @@ const SongBar = () => {
     const mouseLeave = () => {
         document.querySelector(".active_progress").style.background = "green";
     };
-    const enterVolume = () => {
-        document.querySelector("#volume").style.background = "green";
-    };
-    const leaveVolume = () => {
-        document.querySelector("#volume").style.background = "green";
-    };
+
     const backwardSong = () => {
         console.log("backward");
         if(songIdx <= 0 )
@@ -158,13 +162,14 @@ const SongBar = () => {
                             {masterSong?.artist || "Arijit Singh"}
                         </span>
                     </div>
-                    <AiOutlineHeart onClick={addToLiked} className="ml-3 cursor-pointer hover:text-green-400" />
-                    <CgScreen className="ml-3" />
+                  
                 </div>
             </div>
             <div className="w-5/12">
                 <div className="flex justify-center items-center mb-2 gap-6">
-                    <BiShuffle />
+                <button onClick={toggleShuffle} title="Toggle Shuffle">
+                <BiShuffle color={isShuffling ? 'grey' : 'black'} />
+            </button>
                     <IoMdSkipBackward onClick={backwardSong} />
                     {isPlaying ? (
                         <button
@@ -182,7 +187,9 @@ const SongBar = () => {
                         </button>
                     )}
                     <IoMdSkipForward onClick={forwardSong} />
-                    <BiRepeat />
+                    <button onClick={toggleLoop} title="Toggle Loop">
+                <BiRepeat color={isLooping ? 'grey' : 'black'} /> 
+            </button>
                 </div>
                 <div className="flex items-center gap-2">
                     <span className="text-xs">{currTime}</span>
@@ -208,10 +215,7 @@ const SongBar = () => {
                 </div>
             </div>
             <div className="w-2/12 flex items-center gap-2">
-                <AiOutlinePlaySquare className="text-2xl" />
-                <PiMicrophoneStageDuotone className="text-2xl" />
-                <PiQueueLight className="text-2xl" />
-                <BsSpeakerFill className="text-2xl" />
+             
                 {volume <= 0 && <HiSpeakerXMark className="text-2xl" />}
                 {volume > 0 && <HiSpeakerWave className="text-2xl" />}
                 <div className="relative w-full flex items-center">

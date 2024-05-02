@@ -6,14 +6,13 @@ import {
   FaSearch,
   FaUser,
 } from "react-icons/fa";
-import { useDispatch, useSelector } from "react-redux";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+
+import { useLocation } from "react-router-dom";
 import { songs } from "./Home/Home";
 import { useGlobalContext } from "../states/Contet";
 
 
 const Navbar = () => {
-  const { user, isAuthenticated } = useSelector((state) => state.account);
 
   const location = useLocation();
   const [query, setQuery] = useState("");
@@ -33,11 +32,7 @@ const Navbar = () => {
     if (e.target.value === "") setFilteredSongs([]);
     else setFilteredSongs(fil);
   };
-  const [showDropDown, setShowDropDown] = useState(false);
-  const navigate = useNavigate();
-  const dispatch = useDispatch();
-
-
+ 
   useEffect(() => {
     console.log(location.pathname);
   }, [location.pathname]);

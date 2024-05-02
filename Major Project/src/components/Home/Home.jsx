@@ -19,33 +19,50 @@ export const songs = [
   {
     id: Math.random() * Date.now(),
     title: "Judaiyaan",
-    artist: "Arijit ",
+    artist: "Sidhu Moose Wala ",
     mp3: new Audio("/assets/mp3/Judaiyaan.mp3"),
-    img: "/assets/card.jpg",
+    img: "/assets/sidhu.jpg",
   },
   {
     id: Math.random() * Date.now(),
     title: "Heeriye",
-    artist: "Arijit",
+    artist: "Karan Aujila",
     mp3: new Audio("/assets/mp3/Heeriye.m4a"),
+    img: "/assets/images.jpeg",
+  },
+  {
+    id: Math.random() * Date.now(),
+    title: "Mushkil",
+    artist: "Arijit",
+    mp3: new Audio("/assets/mp3/ae.mp3"),
     img: "/assets/card.jpg",
   },
 
+  {
+    id: Math.random() * Date.now(),
+    title: "Judai",
+    artist: "Sidhu Moose Wala ",
+    mp3: new Audio("/assets/mp3/Judaiyaan.mp3"),
+    img: "/assets/sidhu.jpg",
+  },
+  {
+    id: Math.random() * Date.now(),
+    title: "Heer",
+    artist: "Karan Aujila",
+    mp3: new Audio("/assets/mp3/Heeriye.m4a"),
+    img: "/assets/images.jpeg",
+  },
 ];
 
 const Home = () => {
-
-  const { getUser } = useGlobalContext();
-
   useEffect(() => {
-    getUser();
+    
   }, []);
   return (
     <Layout>
       <Navbar />
 
       <div className="tertiary_bg ml-2 px-4 py-4 home ">
-
 
         <div className="flex justify-between my-4 items-center">
           <span className="text-xl font-bold hover:underline cursor-pointer">

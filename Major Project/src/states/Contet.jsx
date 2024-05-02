@@ -1,6 +1,6 @@
 import { createContext, useContext, useState } from "react";
 import { useDispatch } from "react-redux";
-import { userActor } from "./Actors/UserActor";
+import {  } from "./Actors/UserActor";
 import { toast } from "react-toastify";
 
 const AppContext = createContext();
@@ -31,9 +31,9 @@ export const AppProvider = ({ children }) => {
       });
       const data = await res.json();
       if (data.success) {
-        dispatch(userActor(data.user));
+      //  dispatch(userActor(data.user));
       } else {
-        toast.error(data.message);
+        toast.error('Error');
       }
     }
   };
